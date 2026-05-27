@@ -109,6 +109,21 @@ textarea{resize:vertical}
 .body-text{font-size:13px;line-height:1.9;color:var(--t1);white-space:pre-wrap;background:var(--bg);border:1px solid var(--b1);border-radius:var(--rs);padding:12px;min-height:100px}
 .copy-btn{display:flex;align-items:center;gap:5px;font-size:12px}
 .section-head{font-size:12px;font-weight:500;color:var(--t2);margin:14px 0 8px;letter-spacing:.4px;text-transform:uppercase}
+
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--b1);z-index:200;padding-bottom:env(safe-area-inset-bottom)}
+.mob-nav-inner{display:flex;justify-content:space-around;align-items:center;height:52px}
+.mob-tab{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 8px;color:var(--t2);font-size:10px;border:none;background:none;font-family:inherit;flex:1}
+.mob-tab.on{color:var(--acc)}
+.mob-tab-ic{font-size:18px;line-height:1}
+@media(max-width:650px){
+  .sidebar{display:none}
+  .mob-nav{display:block}
+  .main{padding:1rem;padding-bottom:70px}
+  .topbar{padding:0 1rem}
+  .logo em{display:none}
+  .g4{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
@@ -865,6 +880,21 @@ function cancelEdit(){
   document.getElementById('modal-edit').style.display = 'none';
 }
 
+
+function mobTab(id, el){
+  // 同步侧边栏高亮
+  document.querySelectorAll('.nav').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('pn-'+id).classList.add('on');
+  if(id==='archive')rArc();
+  if(id==='timeline')rTl();
+  if(id==='data')rData();
+  if(id==='style')rSty();
+  if(id==='growth')rGr();
+  window.scrollTo(0,0);
+}
 load();
 </script>
 
@@ -907,6 +937,17 @@ load();
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="mob-nav">
+  <div class="mob-nav-inner">
+    <button class="mob-tab on" onclick="mobTab('record',this)"><span class="mob-tab-ic">✏️</span>记录</button>
+    <button class="mob-tab" onclick="mobTab('archive',this)"><span class="mob-tab-ic">📁</span>收录集</button>
+    <button class="mob-tab" onclick="mobTab('timeline',this)"><span class="mob-tab-ic">📅</span>排期</button>
+    <button class="mob-tab" onclick="mobTab('data',this)"><span class="mob-tab-ic">📊</span>复盘</button>
+    <button class="mob-tab" onclick="mobTab('growth',this)"><span class="mob-tab-ic">🚀</span>成长</button>
+    <button class="mob-tab" onclick="mobTab('style',this)"><span class="mob-tab-ic">🎨</span>风格</button>
   </div>
 </div>
 </body>
