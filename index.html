@@ -131,7 +131,7 @@ textarea{resize:vertical}
   <div class="logo">阿寶内容工作台<em>HR × 心理咨询师</em></div>
   <div class="topbar-r">
     <span id="last-backup" style="font-size:11px;color:var(--t3)">备份：从未</span>
-    <label class="btn" style="cursor:pointer">⬆ 导入<input type="file" accept=".xlsx,.xls,.json" onchange="importFile(event)" style="display:none"></label>
+    <button class="btn" onclick="document.getElementById('file-input').click()">⬆ 导入</button><input type="file" id="file-input" accept=".json" onchange="importFile(event)" style="display:none;position:absolute;left:-9999px">
     <button class="btn" onclick="exportData()">⬇ 导出备份</button>
   </div>
 </div>
