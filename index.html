@@ -135,7 +135,7 @@ textarea{resize:vertical}
     <span id="last-import" class="hide-mobile" style="font-size:11px;color:var(--t3)">数据：未导入</span>
     <span id="last-backup" class="hide-mobile" style="font-size:11px;color:var(--t3);margin-left:8px">备份：从未</span>
     <input type="file" id="file-input" accept=".json,.txt,application/json,text/plain" onchange="importFile(event)" style="display:none;position:absolute;left:-9999px">
-    <button class="btn" onclick="showImportModal()">⬆ 导入</button>
+    <button class="btn" onclick="showImportModal()" ontouchend="event.preventDefault();showImportModal()">⬆ 导入</button>
     <button class="btn hide-mobile" onclick="exportData()">⬇ 导出</button>
     <button class="btn" onclick="showDataMenu()" title="数据管理">⋯</button>
   </div>
@@ -983,7 +983,8 @@ function hideDataMenu(){
 // 点击其他地方关闭菜单
 document.addEventListener('click',function(e){
   const m=document.getElementById('data-menu');
-  if(m&&!m.contains(e.target)&&!e.target.closest('[onclick*="showDataMenu"]')){
+  if(!m)return;
+  if(m.style.display==='block'&&!m.contains(e.target)&&!e.target.closest('button[onclick*="showDataMenu"]')){
     m.style.display='none';
   }
 });
