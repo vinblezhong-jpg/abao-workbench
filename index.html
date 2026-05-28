@@ -887,6 +887,10 @@ function closeModalDirect(){
   modalId = null;
 }
 
+function goCards(){
+  window.open('https://vinblezhong-jpg.github.io/abao-workbench/cards.html','_blank');
+}
+
 function copyBody(){
   const e = DB.find(x=>x.id===modalId);
   if(!e || !e.body) return;
@@ -1081,6 +1085,7 @@ load();
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
           <button class="btn copy-btn" onclick="copyBody()">📋 复制发布版</button>
           <button class="btn btn-p copy-btn" onclick="enterEdit()">✏️ 编辑发布版</button>
+          <button class="btn copy-btn" onclick="goCards()" style="background:var(--ambg);color:var(--amt);border-color:var(--amt)">📐 去配图页</button>
         </div>
         <div style="display:flex;gap:0;border-bottom:1px solid var(--b1);margin-bottom:12px">
           <button class="tab on" id="tab-pub" onclick="bodyTab('pub')" style="font-size:12px;padding:6px 14px">发布版</button>

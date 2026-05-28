@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>阿寶配图生成器</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#EAECEF;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC",sans-serif;padding:16px;min-height:100vh}
+
+/* 顶栏 */
+.topbar{background:#fff;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.topbar-logo{font-size:15px;color:#8B5E3C;font-weight:500}
+.topbar-back{font-size:12px;color:#C49B3F;text-decoration:none;border:1px solid #C49B3F;padding:5px 12px;border-radius:20px}
+
+/* 系列tabs */
+.series-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;overflow-x:auto;padding-bottom:4px}
+.series-tab{padding:6px 16px;border-radius:20px;border:1px solid #D4C4A8;background:#fff;font-size:13px;cursor:pointer;color:#7a6a5a;white-space:nowrap;flex-shrink:0}
+.series-tab.on{background:#8B5E3C;color:#fff;border-color:#8B5E3C}
+
+/* 期数tabs */
+.ep-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.ep-tab{padding:6px 16px;border-radius:20px;border:1px solid #D4C4A8;background:#fff;font-size:13px;cursor:pointer;color:#7a6a5a;flex-shrink:0}
+.ep-tab.on{background:#C49B3F;color:#fff;border-color:#C49B3F}
+
+/* 卡片组 */
+.series-group{display:none}
+.series-group.on{display:block}
+.ep-group{display:none;flex-direction:column;gap:16px;align-items:center}
+.ep-group.on{display:flex}
+
+/* 下载按钮 */
+.dl-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+.dl-btn{background:#C49B3F;color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:12px;cursor:pointer}
+.dl-btn:active{opacity:.8}
+.dl-btn.sec{background:#8B5E3C}
+
+/* 卡片 3:4 */
+.card{width:340px;min-height:453px;position:relative;overflow:hidden;border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,.1)}
+.card::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(0,0,0,.015) 1px,transparent 1px);background-size:14px 14px;pointer-events:none;z-index:1}
+.sign{position:absolute;bottom:16px;left:0;right:0;text-align:center;font-size:9px;letter-spacing:.5px;z-index:2;color:#C9B28B}
+.ep-badge{position:absolute;top:16px;left:16px;font-size:10px;font-weight:500;letter-spacing:.8px;padding:3px 9px;border-radius:20px;z-index:2;background:rgba(255,248,231,.85);color:#B8891E}
+.deco-line{position:absolute;bottom:44px;left:20%;width:60%;height:1px;background:linear-gradient(90deg,transparent,#E8D5B5,transparent);z-index:2}
+
+/* 封面 */
+.cover-card{background:radial-gradient(circle at 15% 20%,#FFFBF0,#FFF2DC)}
+.cover-content{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;height:453px;padding:0 28px;position:relative;z-index:2}
+.cover-main{font-size:30px;font-weight:700;color:#2C2C2C;line-height:1.3;margin-bottom:10px}
+.cover-gold{color:#C49B3F}
+.cover-sub{font-size:13px;color:#7F6B4A;line-height:1.6;margin-top:4px}
+
+/* 内容卡 */
+.content-card{background:linear-gradient(160deg,#FFFDF8,#FFF6E8)}
+.content-inner{padding:52px 28px 52px;position:relative;z-index:2;height:453px;display:flex;flex-direction:column;justify-content:center}
+.c-label{font-size:10px;color:#C49B3F;letter-spacing:1.5px;margin-bottom:14px;font-weight:500}
+.c-item{display:flex;gap:9px;align-items:flex-start;margin-bottom:12px}
+.c-dot{width:5px;height:5px;border-radius:50%;background:#C49B3F;flex-shrink:0;margin-top:7px}
+.c-text{font-size:14px;color:#2C2C2C;line-height:1.65}
+.c-sub{font-size:12px;color:#8B7355;font-style:italic;line-height:1.5;margin-top:3px}
+.c-div{height:1px;background:linear-gradient(90deg,transparent,#E8D5B5,transparent);margin:14px 0}
+
+/* 心理分析卡 */
+.psych-card{background:linear-gradient(140deg,#FFFBF2,#FFF0D8)}
+.psych-inner{padding:52px 28px 52px;position:relative;z-index:2;height:453px;display:flex;flex-direction:column;justify-content:center}
+.p-label{font-size:10px;color:#C49B3F;letter-spacing:1.5px;margin-bottom:16px;font-weight:500}
+.p-theory{background:rgba(196,155,63,.08);border-left:3px solid #C49B3F;padding:10px 12px;border-radius:0 5px 5px 0;margin-bottom:12px}
+.p-name{font-size:12px;font-weight:600;color:#8B6914;margin-bottom:3px}
+.p-desc{font-size:12px;color:#5a4a3a;line-height:1.65}
+.p-insight{font-size:13px;color:#2C2C2C;line-height:1.8;margin-top:14px;padding-top:14px;border-top:1px solid rgba(196,155,63,.2)}
+
+/* 金句卡 */
+.quote-card{background:radial-gradient(circle at 80% 80%,#FFF8E7,#FFF0D0)}
+.quote-inner{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;height:453px;padding:0 36px;position:relative;z-index:2}
+.q-mark{font-size:44px;color:rgba(196,155,63,.2);line-height:1;margin-bottom:6px;font-family:Georgia,serif}
+.q-main{font-size:20px;font-weight:700;color:#2C2C2C;line-height:1.5;margin-bottom:14px}
+.q-gold{color:#C49B3F}
+.q-sub{font-size:12px;color:#8B7355}
+
+@media(max-width:380px){
+  .card{width:300px;min-height:400px}
+  .cover-content,.quote-inner{height:400px}
+  .content-inner,.psych-inner{height:400px}
+  .cover-main{font-size:26px}
+  .q-main{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">📐 阿寶配图生成器</div>
+  <a href="https://vinblezhong-jpg.github.io/abao-workbench/" class="topbar-back">← 返回工作台</a>
+</div>
+
+<!-- 系列选择 -->
+<div class="series-tabs">
+  <button class="series-tab on" onclick="showSeries('a',this)">A事件系列</button>
+  <button class="series-tab" onclick="showSeries('borrow',this)">借钱篇</button>
+  <button class="series-tab" onclick="showSeries('super',this)">超市篇</button>
+</div>
+
+<!-- A事件系列 -->
+<div id="series-a" class="series-group on">
+  <div class="ep-tabs">
+    <button class="ep-tab on" onclick="showEp('a',1,this)">第一期</button>
+    <button class="ep-tab" onclick="showEp('a',2,this)">第二期</button>
+    <button class="ep-tab" onclick="showEp('a',3,this)">第三期</button>
+  </div>
+
+  <!-- A 一期 -->
+  <div id="a-ep1" class="ep-group on">
+    <div class="dl-row">
+      <button class="dl-btn" onclick="dl('a1c1','A事件一期_封面')">封面</button>
+      <button class="dl-btn" onclick="dl('a1c2','A事件一期_内容')">内容</button>
+      <button class="dl-btn" onclick="dl('a1c3','A事件一期_心理')">心理</button>
+      <button class="dl-btn" onclick="dl('a1c4','A事件一期_金句')">金句</button>
+      <button class="dl-btn sec" onclick="dlAll(['a1c1','a1c2','a1c3','a1c4'],['封面','内容','心理','金句'],'A事件一期')">全部↓</button>
+    </div>
+    <div class="card cover-card" id="a1c1">
+      <div class="ep-badge">职场识人·第一期</div>
+      <div class="cover-content">
+        <div class="cover-main">混了好几年<br><span class="cover-gold">被我3个月看穿</span></div>
+        <div class="cover-sub">做HR这么多年，我有个习惯<br>看一个人，不听他说什么<br>看他怎么对别人说</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+    <div class="card content-card" id="a1c2">
+      <div class="ep-badge">职场识人·第一期</div>
+      <div class="content-inner">
+        <div class="c-label">他的三种面孔</div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">对上面的人</div><div class="c-sub">笑脸相迎，话特别多</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">对普通同事</div><div class="c-sub">爱答不理，支使跑腿</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">对我这个新管理者</div><div class="c-sub">表面配合，私下阳奉阴违</div></div></div>
+        <div class="c-div"></div>
+        <div class="c-item"><div class="c-dot" style="background:#8B6914"></div><div><div class="c-text" style="color:#8B6914;font-weight:500">一个人最真实的样子</div><div class="c-sub">不是在压力下暴露的<br>是在他以为没人看的时候</div></div></div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+    <div class="card psych-card" id="a1c3">
+      <div class="ep-badge">职场识人·第一期</div>
+      <div class="psych-inner">
+        <div class="p-label">心理学说</div>
+        <div class="p-theory"><div class="p-name">邓宁-克鲁格效应</div><div class="p-desc">高估自身能力，用优越感掩盖内心的自我价值感缺失</div></div>
+        <div class="p-theory"><div class="p-name">投射效应</div><div class="p-desc">把对权力的渴望投射到行为上，欺软怕硬是内心权力焦虑的外化</div></div>
+        <div class="p-insight">聪明劲全用在保护自己上的人<br>往往是因为他从未真正感到安全</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+    <div class="card quote-card" id="a1c4">
+      <div class="ep-badge">职场识人·第一期</div>
+      <div class="quote-inner">
+        <div class="q-mark">"</div>
+        <div class="q-main">看人<br>要看够了再动<br><span class="q-gold">不要看一半就出手</span></div>
+        <div class="q-sub">——阿寶在成长</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+  </div>
+
+  <!-- A 二期 -->
+  <div id="a-ep2" class="ep-group">
+    <div class="dl-row">
+      <button class="dl-btn" onclick="dl('a2c1','A事件二期_封面')">封面</button>
+      <button class="dl-btn" onclick="dl('a2c2','A事件二期_内容')">内容</button>
+      <button class="dl-btn" onclick="dl('a2c3','A事件二期_心理')">心理</button>
+      <button class="dl-btn" onclick="dl('a2c4','A事件二期_金句')">金句</button>
+      <button class="dl-btn sec" onclick="dlAll(['a2c1','a2c2','a2c3','a2c4'],['封面','内容','心理','金句'],'A事件二期')">全部↓</button>
+    </div>
+    <div class="card cover-card" id="a2c1">
+      <div class="ep-badge">职场识人·第二期</div>
+      <div class="cover-content">
+        <div class="cover-main">他说"别怪我"<br><span class="cover-gold">其实在说"都怪你"</span></div>
+        <div class="cover-sub">有些话表面是委屈<br>其实是提前甩锅</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+    <div class="card content-card" id="a2c2">
+      <div class="ep-badge">职场识人·第二期</div>
+      <div class="content-inner">
+        <div class="c-label">事情是这样的</div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">他说任务对接好了</div><div class="c-sub">实际上，根本没有</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">责任被甩到我头上</div><div class="c-sub">我没接，重新帮大家捋清楚流程</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">他在群里直接命令我</div><div class="c-sub">不是商量，是要求</div></div></div>
+        <div class="c-div"></div>
+        <div class="c-item"><div class="c-dot" style="background:#8B6914"></div><div><div class="c-text" style="color:#8B6914;font-weight:500">他最后那句话</div><div class="c-sub">「那以后就别怪我不干活」<br>我一听就明白了</div></div></div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+    <div class="card psych-card" id="a2c3">
+      <div class="ep-badge">职场识人·第二期</div>
+      <div class="psych-inner">
+        <div class="p-label">心理学说</div>
+        <div class="p-theory"><div class="p-name">受害者叙事</div><div class="p-desc">把错推给外界，就不用面对无能的自己。这是一种本能的自我保护机制</div></div>
+        <div class="p-theory"><div class="p-name">认知失调理论</div><div class="p-desc">无法接受「自己有错」的认知，用受害者身份消解内心冲突</div></div>
+        <div class="p-insight">他感受到被质疑，立刻把自己变成受害者<br>不是「我做错了」，而是「你们针对我」</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+    <div class="card quote-card" id="a2c4">
+      <div class="ep-badge">职场识人·第二期</div>
+      <div class="quote-inner">
+        <div class="q-mark">"</div>
+        <div class="q-main">一个人认个错有多难<br><span class="q-gold">他的自我价值感<br>就有多脆弱</span></div>
+        <div class="q-sub">——阿寶在成长</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+  </div>
+
+  <!-- A 三期 -->
+  <div id="a-ep3" class="ep-group">
+    <div class="dl-row">
+      <button class="dl-btn" onclick="dl('a3c1','A事件三期_封面')">封面</button>
+      <button class="dl-btn" onclick="dl('a3c2','A事件三期_内容')">内容</button>
+      <button class="dl-btn" onclick="dl('a3c3','A事件三期_心理')">心理</button>
+      <button class="dl-btn" onclick="dl('a3c4','A事件三期_金句')">金句</button>
+      <button class="dl-btn sec" onclick="dlAll(['a3c1','a3c2','a3c3','a3c4'],['封面','内容','心理','金句'],'A事件三期')">全部↓</button>
+    </div>
+    <div class="card cover-card" id="a3c1">
+      <div class="ep-badge">职场识人·第三期</div>
+      <div class="cover-content">
+        <div class="cover-main">对不起<br><span class="cover-gold">我要不起</span></div>
+        <div class="cover-sub">他冲进我办公室那天<br>我只说了四个字</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+    <div class="card content-card" id="a3c2">
+      <div class="ep-badge">职场识人·第三期</div>
+      <div class="content-inner">
+        <div class="c-label">我给上级的方案</div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">正式划归对接部门</div><div class="c-sub">新增外勤专员岗位，专职外部事务</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">人事部内部自己消化</div><div class="c-sub">不需要额外增人</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">后续临时外勤需求</div><div class="c-sub">请对方部门走正式招聘流程</div></div></div>
+        <div class="c-div"></div>
+        <div class="c-item"><div class="c-dot" style="background:#8B6914"></div><div><div class="c-text" style="color:#8B6914;font-weight:500">上级问：你们不要他了？</div><div class="c-sub">我说：对不起，我要不起</div></div></div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+    <div class="card psych-card" id="a3c3">
+      <div class="ep-badge">职场识人·第三期</div>
+      <div class="psych-inner">
+        <div class="p-label">心理学说</div>
+        <div class="p-theory"><div class="p-name">心理边界感</div><div class="p-desc">清楚区分责任边界，不被情绪化请求绑架，是成熟人格的核心能力</div></div>
+        <div class="p-theory"><div class="p-name">现实检验法</div><div class="p-desc">把事实摆出来让对方照镜子，是认知行为疗法中处理防御性归因的经典技术</div></div>
+        <div class="p-insight">真正有边界感的人，不是不会退让<br>是知道什么时候必须说清楚</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+    <div class="card quote-card" id="a3c4">
+      <div class="ep-badge">职场识人·第三期</div>
+      <div class="quote-inner">
+        <div class="q-mark">"</div>
+        <div class="q-main">把事实摆出来<br>让对方自己照镜子<br><span class="q-gold">不解释，不争辩<br>不自证</span></div>
+        <div class="q-sub">——阿寶在成长</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场识人</div>
+    </div>
+  </div>
+</div>
+
+<!-- 借钱篇 -->
+<div id="series-borrow" class="series-group">
+  <div class="ep-group on" id="borrow-ep1">
+    <div class="dl-row">
+      <button class="dl-btn" onclick="dl('bc1','借钱篇_封面')">封面</button>
+      <button class="dl-btn" onclick="dl('bc2','借钱篇_内容')">内容</button>
+      <button class="dl-btn" onclick="dl('bc3','借钱篇_心理')">心理</button>
+      <button class="dl-btn" onclick="dl('bc4','借钱篇_金句')">金句</button>
+      <button class="dl-btn sec" onclick="dlAll(['bc1','bc2','bc3','bc4'],['封面','内容','心理','金句'],'借钱篇')">全部↓</button>
+    </div>
+    <div class="card cover-card" id="bc1">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="cover-content">
+        <div class="cover-main">朋友找我借钱<br><span class="cover-gold">我只问三个问题</span></div>
+        <div class="cover-sub">第三个问题，她沉默了</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜HR×心理咨询师</div>
+    </div>
+    <div class="card content-card" id="bc2">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="content-inner">
+        <div class="c-label">我问的三个问题</div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">这是紧急情况<br>还是长期钱不够用？</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">如果我不借<br>你还有其他办法吗？</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">如果我借了<br>大概什么时候能还？</div></div></div>
+        <div class="c-div"></div>
+        <div class="c-item"><div class="c-dot" style="background:#8B6914"></div><div><div class="c-text" style="color:#8B6914;font-weight:500">她回答完，我心里有数了</div><div class="c-sub">我拒绝了</div></div></div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜HR×心理咨询师</div>
+    </div>
+    <div class="card psych-card" id="bc3">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="psych-inner">
+        <div class="p-label">心理学说</div>
+        <div class="p-theory"><div class="p-name">关系边界感</div><div class="p-desc">借钱是人际边界的考验，说不的能力反映自我价值感</div></div>
+        <div class="p-theory"><div class="p-name">依恋理论</div><div class="p-desc">无法拒绝借钱，往往源于对关系破裂的焦虑，即不安全依恋模式</div></div>
+        <div class="p-insight">借钱是一道照妖镜<br>不是照对方<br>是照你自己</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜HR×心理咨询师</div>
+    </div>
+    <div class="card quote-card" id="bc4">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="quote-inner">
+        <div class="q-mark">"</div>
+        <div class="q-main">说不<br>是一种能力<br><span class="q-gold">不是一种冷漠</span></div>
+        <div class="q-sub">——阿寶在成长</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜HR×心理咨询师</div>
+    </div>
+  </div>
+</div>
+
+<!-- 超市篇 -->
+<div id="series-super" class="series-group">
+  <div class="ep-group on" id="super-ep1">
+    <div class="dl-row">
+      <button class="dl-btn" onclick="dl('sc1','超市篇_封面')">封面</button>
+      <button class="dl-btn" onclick="dl('sc2','超市篇_内容')">内容</button>
+      <button class="dl-btn" onclick="dl('sc3','超市篇_心理')">心理</button>
+      <button class="dl-btn" onclick="dl('sc4','超市篇_金句')">金句</button>
+      <button class="dl-btn sec" onclick="dlAll(['sc1','sc2','sc3','sc4'],['封面','内容','心理','金句'],'超市篇')">全部↓</button>
+    </div>
+    <div class="card cover-card" id="sc1">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="cover-content">
+        <div class="cover-main">带娃去超市<br><span class="cover-gold">比200块海洋馆值多了</span></div>
+        <div class="cover-sub">他在自动门前站了五分钟</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜育儿观察</div>
+    </div>
+    <div class="card content-card" id="sc2">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="content-inner">
+        <div class="c-label">他做了什么</div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">在自动门前进进出出</div><div class="c-sub">看了整整五分钟怎么开关</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">蹲在生鲜区看鱼</div><div class="c-sub">问我鱼睡不睡觉</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">要自己推购物车</div><div class="c-sub">推歪了也不让扶</div></div></div>
+        <div class="c-div"></div>
+        <div class="c-item"><div class="c-dot" style="background:#8B6914"></div><div><div class="c-text" style="color:#8B6914;font-weight:500">回来路上他说</div><div class="c-sub">妈妈，超市好好玩</div></div></div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜育儿观察</div>
+    </div>
+    <div class="card psych-card" id="sc3">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="psych-inner">
+        <div class="p-label">发展心理学说</div>
+        <div class="p-theory"><div class="p-name">秩序敏感期</div><div class="p-desc">3岁孩子对程序和秩序的执着（推车不让扶）是秩序敏感期的典型表现</div></div>
+        <div class="p-theory"><div class="p-name">内在动机理论</div><div class="p-desc">孩子不需要外部刺激，日常场景已足够激发内在好奇心</div></div>
+        <div class="p-insight">孩子需要的不是更贵的体验<br>是有人陪他认真看这个世界</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜育儿观察</div>
+    </div>
+    <div class="card quote-card" id="sc4">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="quote-inner">
+        <div class="q-mark">"</div>
+        <div class="q-main">不是更贵的体验<br>是有人陪他<br><span class="q-gold">认真看这个世界</span></div>
+        <div class="q-sub">——阿寶在成长</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜育儿观察</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSeries(id, el){
+  document.querySelectorAll('.series-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.series-group').forEach(g=>g.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('series-'+id).classList.add('on');
+}
+
+function showEp(series, n, el){
+  const group = document.getElementById('series-'+series);
+  group.querySelectorAll('.ep-tab').forEach(t=>t.classList.remove('on'));
+  group.querySelectorAll('.ep-group').forEach(g=>g.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById(series+'-ep'+n).classList.add('on');
+}
+
+function dl(id, name){
+  const el = document.getElementById(id);
+  html2canvas(el,{scale:2,backgroundColor:null,useCORS:true,logging:false}).then(canvas=>{
+    const a=document.createElement('a');
+    a.download=name+'.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+  });
+}
+
+async function dlAll(ids, names, prefix){
+  const btn=event.target;
+  const orig=btn.textContent;
+  btn.textContent='下载中...';
+  btn.disabled=true;
+  for(let i=0;i<ids.length;i++){
+    await new Promise(r=>setTimeout(r,400));
+    await new Promise(resolve=>{
+      html2canvas(document.getElementById(ids[i]),{scale:2,backgroundColor:null,useCORS:true,logging:false}).then(canvas=>{
+        const a=document.createElement('a');
+        a.download=prefix+'_'+names[i]+'.png';
+        a.href=canvas.toDataURL('image/png');
+        a.click();
+        resolve();
+      });
+    });
+  }
+  btn.textContent=orig;
+  btn.disabled=false;
+}
+</script>
+</body>
+</html>
