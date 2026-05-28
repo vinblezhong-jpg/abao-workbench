@@ -135,7 +135,7 @@ textarea{resize:vertical}
     <span id="last-import" class="hide-mobile" style="font-size:11px;color:var(--t3)">数据：未导入</span>
     <span id="last-backup" class="hide-mobile" style="font-size:11px;color:var(--t3);margin-left:8px">备份：从未</span>
     <input type="file" id="file-input" accept=".json,.txt,application/json,text/plain" onchange="importFile(event)" style="display:none;position:absolute;left:-9999px">
-    <button class="btn" onclick="document.getElementById('file-input').click()">⬆ 导入</button>
+    <button class="btn" onclick="showImportModal()">⬆ 导入</button>
     <button class="btn hide-mobile" onclick="exportData()">⬇ 导出</button>
     <button class="btn" onclick="showDataMenu()" title="数据管理">⋯</button>
   </div>
