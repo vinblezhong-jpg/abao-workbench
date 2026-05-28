@@ -130,9 +130,11 @@ textarea{resize:vertical}
 <div class="topbar">
   <div class="logo">阿寶内容工作台<em>HR × 心理咨询师</em></div>
   <div class="topbar-r">
-    <span id="last-backup" style="font-size:11px;color:var(--t3)">备份：从未</span>
-    <button class="btn" onclick="document.getElementById('file-input').click()">⬆ 导入</button><input type="file" id="file-input" accept=".json" onchange="importFile(event)" style="display:none;position:absolute;left:-9999px">
+    <span id="last-backup" style="font-size:11px;color:var(--t3)">备份：从未</span><span id="last-import" style="font-size:11px;color:var(--t3);margin-left:8px">数据：未导入</span>
+    <button class="btn" onclick="document.getElementById('file-input').click()">⬆ 导入</button><input type="file" id="file-input" accept=".json,.txt,application/json,text/plain" onchange="importFile(event)" style="display:none;position:absolute;left:-9999px">
     <button class="btn" onclick="exportData()">⬇ 导出备份</button>
+    <button class="btn" onclick="checkRefresh()" style="color:var(--t2)">↺ 刷新</button>
+    <button class="btn" onclick="clearData()" style="color:#C0392B">🗑 清数据</button>
   </div>
 </div>
 
@@ -323,6 +325,9 @@ function load(){
   const bt=localStorage.getItem(SK+'_bt');
   const el=document.getElementById('last-backup');
   if(el)el.textContent=bt?'备份：'+bt:'备份：从未';
+  const it=localStorage.getItem(SK+'_it');
+  const iel=document.getElementById('last-import');
+  if(iel)iel.textContent=it?'数据：'+it:'数据：未导入';
 }
 function save(){try{localStorage.setItem(SK,JSON.stringify(DB));}catch(e){}uc();}
 function uc(){document.getElementById('cnt').textContent=DB.length;}
@@ -332,23 +337,31 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function importFile(e){
   const file=e.target.files[0];if(!file)return;
   const ext=file.name.split('.').pop().toLowerCase();
-  if(ext==='json'){
+  if(ext==='json'||ext==='txt'){
     const r=new FileReader();
     r.onload=ev=>{
       try{
         const p=JSON.parse(ev.target.result);
         const arr=p.data||p;
-        if(!Array.isArray(arr))throw new Error();
-        const ex=new Set(DB.map(x=>x.id));
-        const nw=arr.filter(x=>!ex.has(x.id));
-        DB=[...DB,...nw];save();
-        toast(`导入成功，新增 ${nw.length} 篇`);
+        if(!Array.isArray(arr))throw new Error('格式错误');
+        // 覆盖更新已有id，新增不存在的id
+        arr.forEach(item=>{
+          const idx=DB.findIndex(x=>x.id===item.id);
+          if(idx>=0) DB[idx]=item;
+          else DB.push(item);
+        });
+        save();
+        const inow=new Date().toLocaleDateString('zh-CN')+' '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+        localStorage.setItem(SK+'_it',inow);
+        const iel=document.getElementById('last-import');
+        if(iel)iel.textContent='数据：'+inow;
+        toast(`导入成功，共 ${arr.length} 篇`);
         rArc();
-      }catch{toast('JSON格式错误');}
+      }catch(err){toast('文件格式有误，请检查');}
     };
-    r.readAsText(file);
+    r.readAsText(file,'UTF-8');
   } else {
-    toast('请上传 .json 备份文件，XLS数据已直接内置在复盘模块');
+    toast('请上传 .json 或 .txt 格式的备份文件');
   }
   e.target.value='';
 }
@@ -913,6 +926,36 @@ function bodyTab(type){
   document.getElementById('tab-orig').classList.toggle('on', type==='orig');
   document.getElementById('body-pub').style.display = type==='pub'?'block':'none';
   document.getElementById('body-orig').style.display = type==='orig'?'block':'none';
+}
+
+function clearData(){
+  if(confirm('确认清除所有收录集数据？\n\n清除前建议先导出备份。\n\n此操作不可撤销。')){
+    localStorage.removeItem(SK);
+    localStorage.removeItem(SK+'_bt');
+    localStorage.removeItem(SK+'_it');
+    DB=[];
+    uc();
+    const iel=document.getElementById('last-import');
+    if(iel)iel.textContent='数据：未导入';
+    const bel=document.getElementById('last-backup');
+    if(bel)bel.textContent='备份：从未';
+    rArc();
+    toast('数据已清除，可重新导入');
+  }
+}
+
+function checkRefresh(){
+  const it=localStorage.getItem(SK+'_it');
+  if(!it){
+    if(confirm('当前没有导入过数据，是否现在导入？')){
+      document.getElementById('file-input').click();
+    }
+  } else {
+    const msg=`当前数据导入于：${it}\n\n如果你在其他设备有更新数据，需要重新导入最新备份文件。\n\n现在导入？`;
+    if(confirm(msg)){
+      document.getElementById('file-input').click();
+    }
+  }
 }
 
 function mobTab(id, el){
