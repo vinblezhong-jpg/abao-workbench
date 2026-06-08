@@ -98,6 +98,7 @@ body{background:#EAECEF;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans 
   <button class="series-tab on" onclick="showSeries('a',this)">A事件系列</button>
   <button class="series-tab" onclick="showSeries('borrow',this)">借钱篇</button>
   <button class="series-tab" onclick="showSeries('super',this)">超市篇</button>
+  <button class="series-tab" onclick="showSeries('psych',this)">心理科普</button>
 </div>
 
 <!-- A事件系列 -->
@@ -225,39 +226,50 @@ body{background:#EAECEF;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans 
       <button class="dl-btn" onclick="dl('a3c4','A事件三期_金句')">金句</button>
       <button class="dl-btn sec" onclick="dlAll(['a3c1','a3c2','a3c3','a3c4'],['封面','内容','心理','金句'],'A事件三期')">全部↓</button>
     </div>
+
     <div class="card cover-card" id="a3c1">
       <div class="ep-badge">职场识人·第三期</div>
       <div class="cover-content">
-        <div class="cover-main">对不起<br><span class="cover-gold">我要不起</span></div>
-        <div class="cover-sub">他冲进我办公室那天<br>我只说了四个字</div>
+        <div class="cover-main">被人堵到墙角</div>
+        <div class="cover-main cover-gold" style="margin-top:4px">我只说了四个字</div>
+        <div class="cover-sub" style="margin-top:20px">把事实摆出来<br>让对方自己照镜子</div>
       </div>
       <div class="deco-line"></div>
       <div class="sign">阿寶在成长｜职场识人</div>
     </div>
+
     <div class="card content-card" id="a3c2">
       <div class="ep-badge">职场识人·第三期</div>
       <div class="content-inner">
-        <div class="c-label">我给上级的方案</div>
-        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">正式划归对接部门</div><div class="c-sub">新增外勤专员岗位，专职外部事务</div></div></div>
-        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">人事部内部自己消化</div><div class="c-sub">不需要额外增人</div></div></div>
-        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">后续临时外勤需求</div><div class="c-sub">请对方部门走正式招聘流程</div></div></div>
+        <div class="c-label">事情是这样的</div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">有人拿着问题冲过来</div><div class="c-sub">身后还跟着人撑腰，气势很足</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">我没慌，没争</div><div class="c-sub">先把来龙去脉从源头捋了一遍</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">问题不是今天产生的</div><div class="c-sub">是对方积压到今天，突然要我收拾</div></div></div>
         <div class="c-div"></div>
-        <div class="c-item"><div class="c-dot" style="background:#8B6914"></div><div><div class="c-text" style="color:#8B6914;font-weight:500">上级问：你们不要他了？</div><div class="c-sub">我说：对不起，我要不起</div></div></div>
+        <div class="c-item"><div class="c-dot" style="background:#8B6914"></div><div><div class="c-text" style="color:#8B6914;font-weight:500">我没替他们收拾</div><div class="c-sub">只把事实摆到该看到的人面前<br>对不起，我要不起</div></div></div>
       </div>
       <div class="deco-line"></div>
       <div class="sign">阿寶在成长｜职场识人</div>
     </div>
+
     <div class="card psych-card" id="a3c3">
       <div class="ep-badge">职场识人·第三期</div>
       <div class="psych-inner">
         <div class="p-label">心理学说</div>
-        <div class="p-theory"><div class="p-name">心理边界感</div><div class="p-desc">清楚区分责任边界，不被情绪化请求绑架，是成熟人格的核心能力</div></div>
-        <div class="p-theory"><div class="p-name">现实检验法</div><div class="p-desc">把事实摆出来让对方照镜子，是认知行为疗法中处理防御性归因的经典技术</div></div>
-        <div class="p-insight">真正有边界感的人，不是不会退让<br>是知道什么时候必须说清楚</div>
+        <div class="p-theory">
+          <div class="p-name">心理边界感</div>
+          <div class="p-desc">每个人心里都有一把张量尺。它量的不是对错，是距离——真正的边界感，不是筑一堵墙，是知道什么时候必须说清楚。越界了，你辛苦，我也辛苦。</div>
+        </div>
+        <div class="p-theory">
+          <div class="p-name">现实检验法</div>
+          <div class="p-desc">情绪可以放大问题，但无法改变事实。当对方用气势推着你的时候，最有效的应对不是反击，是把时间线、责任节点还原出来——让事实说话，冲突自然瓦解。</div>
+        </div>
+        <div class="p-insight">真正有底气的人<br>不需要用音量证明自己是对的<br>事实会说话</div>
       </div>
       <div class="deco-line"></div>
       <div class="sign">阿寶在成长｜职场识人</div>
     </div>
+
     <div class="card quote-card" id="a3c4">
       <div class="ep-badge">职场识人·第三期</div>
       <div class="quote-inner">
@@ -269,7 +281,6 @@ body{background:#EAECEF;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans 
       <div class="sign">阿寶在成长｜职场识人</div>
     </div>
   </div>
-</div>
 
 <!-- 借钱篇 -->
 <div id="series-borrow" class="series-group">
@@ -324,6 +335,74 @@ body{background:#EAECEF;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans 
       <div class="deco-line"></div>
       <div class="sign">阿寶在成长｜HR×心理咨询师</div>
     </div>
+  </div>
+</div>
+
+<!-- 心理科普 -->
+<div id="series-psych" class="series-group">
+  <div class="ep-group on" id="psych-ep1">
+
+    <div class="card cover-card" id="pc1">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="cover-content">
+        <div class="cover-main">越爱说委屈的人</div>
+        <div class="cover-main cover-gold" style="margin-top:4px">离远一点</div>
+        <div class="cover-sub" style="margin-top:20px">不是冷漠<br>是自我保护</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场心理</div>
+    </div>
+    <div style="text-align:center;margin:8px 0">
+      <button class="dl-btn" onclick="dl('pc1','委屈_封面')">⬇ 下载封面</button>
+    </div>
+
+    <div class="card content-card" id="pc2">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="content-inner">
+        <div class="c-label">他们的固定动作</div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">任务没完成</div><div class="c-sub">第一句：「因为XXX没配合我」</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">出了问题</div><div class="c-sub">第一反应：找一个可以怪的人</div></div></div>
+        <div class="c-item"><div class="c-dot"></div><div><div class="c-text">被指出错误</div><div class="c-sub">「我已经很努力了，你们不理解我」</div></div></div>
+        <div class="c-div"></div>
+        <div class="c-item"><div class="c-dot" style="background:#8B6914"></div><div><div class="c-text" style="color:#8B6914;font-weight:500">识别只需要观察一件事</div><div class="c-sub">他在「解决问题」<br>还是在「分配责任」？</div></div></div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场心理</div>
+    </div>
+    <div style="text-align:center;margin:8px 0">
+      <button class="dl-btn" onclick="dl('pc2','委屈_内容')">⬇ 下载内容卡</button>
+    </div>
+
+    <div class="card psych-card" id="pc3">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="psych-inner">
+        <div class="p-label">心理学说</div>
+        <div class="p-theory"><div class="p-name">受害者叙事</div><div class="p-desc">把错推给外界，就不用面对无能的自己。承认错误意味着承认「我不够好」，对自我价值感脆弱的人来说太难了</div></div>
+        <div class="p-theory"><div class="p-name">防御性归因</div><div class="p-desc">宁可让整个世界都是错的，也不让自己是错的。这是一种本能的自我保护机制</div></div>
+        <div class="p-insight">越爱说委屈的人<br>越擅长让你觉得<br>是你的问题</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场心理</div>
+    </div>
+    <div style="text-align:center;margin:8px 0">
+      <button class="dl-btn" onclick="dl('pc3','委屈_心理')">⬇ 下载心理卡</button>
+    </div>
+
+    <div class="card quote-card" id="pc4">
+      <div class="ep-badge">阿寶在成长</div>
+      <div class="quote-inner">
+        <div class="q-mark">"</div>
+        <div class="q-main">离远一点<br>不是冷漠<br><span class="q-gold">是自我保护</span></div>
+        <div class="q-sub">——阿寶在成长</div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="sign">阿寶在成长｜职场心理</div>
+    </div>
+    <div style="text-align:center;margin:8px 0;display:flex;gap:8px;justify-content:center">
+      <button class="dl-btn" onclick="dl('pc4','委屈_金句')">⬇ 下载金句卡</button>
+      <button class="dl-btn sec" onclick="dlAll(['pc1','pc2','pc3','pc4'],['封面','内容','心理','金句'],'委屈篇')">⬇ 全部下载</button>
+    </div>
+
   </div>
 </div>
 
